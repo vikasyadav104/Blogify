@@ -6,7 +6,24 @@
 </head>
 <body>
 
+    <%- include("./partials/nav") %>
+
+    <div class="container mt-4">
+      <div class="row">
+        <% blogs.forEach(blog => { %>
+          <div class="col-md-4 mb-4">
+            <div class="card" style="width: 18rem;">
+              <img src="<%= blog.coverImageURL || 'https://via.placeholder.com/286x180' %>" class="card-img-top" alt="Blog Image">
+              <div class="card-body">
+                <h5 class="card-title"><%= blog.title %></h5>
+                <a href="/blog/<%= blog._id %>" class="btn btn-primary">Read More</a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
     <%- include("./partials/script") %>
-     <%- include("./partials/nav") %>
 </body>
 </html>
