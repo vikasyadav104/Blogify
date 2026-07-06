@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const Blog = require("../models/blog");
+const Comment = require("../models/comment");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
@@ -28,24 +29,11 @@ router.get("/add-new", (req, res) => {
     user: req.user,
   });
 });
-router.get('/:id',async (req, res)=>{
-  const blog = await Blog.findById(req.params.id);
-  return res.render("blog",{
-    user: req.user,
-    blog,
-  })
 
-})
 // Handle form submit and save blog
 router.post("/", upload.single("coverImage"), async (req, res) => {
   try {
-    console.log("===== BLOG POST HIT =====");
-    console.log("req.body:", req.body);
-    console.log("req.file:", req.file);
-    console.log("req.user:", req.user);
-
     if (!req.user) {
-      console.log("No req.user found");
       return res.redirect("/user/signin");
     }
 
@@ -60,8 +48,6 @@ router.post("/", upload.single("coverImage"), async (req, res) => {
         : "/images/default-blog.png",
     });
 
-    console.log("BLOG CREATED:", blog);
-
     return res.redirect(`/blog/${blog._id}`);
   } catch (error) {
     console.log("Blog creation error:", error);
@@ -69,7 +55,7 @@ router.post("/", upload.single("coverImage"), async (req, res) => {
   }
 });
 
-// OPEN SINGLE BLOG
+// OPEN SINGLE BLOG + COMMENTS
 router.get("/:id", async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id).populate("createdBy");
@@ -78,13 +64,36 @@ router.get("/:id", async (req, res) => {
       return res.status(404).send("Blog not found");
     }
 
+    const comments = await Comment.find({ blogId: req.params.id }).populate("createdBy");
+
     return res.render("blog", {
       user: req.user,
       blog,
+      comments,
     });
   } catch (error) {
     console.log("Error fetching blog:", error);
     return res.status(500).send("Error loading blog");
+  }
+});
+
+// POST COMMENT
+router.post("/comment/:blogId", async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.redirect("/user/signin");
+    }
+
+    await Comment.create({
+      content: req.body.content,
+      blogId: req.params.blogId,
+      createdBy: req.user._id,
+    });
+
+    return res.redirect(`/blog/${req.params.blogId}`);
+  } catch (error) {
+    console.log("Comment error:", error);
+    return res.status(500).send("Error adding comment");
   }
 });
 

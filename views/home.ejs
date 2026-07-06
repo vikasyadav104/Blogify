@@ -3,20 +3,47 @@
 <head>
     <%- include("./partials/head") %>
     <title>Home Page</title>
+
+    <style>
+      .blog-card {
+        height: 100%;
+      }
+
+.blog-card img {
+  height: 220px;
+  width: 100%;
+  object-fit: contain;
+  background-color: #f8f9fa;
+} 
+
+      .blog-card .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .blog-card .card-title {
+        min-height: 48px;
+      }
+    </style>
 </head>
 <body>
 
     <%- include("./partials/nav") %>
 
     <div class="container mt-4">
-      <div class="row">
+      <div class="row g-4">
         <% blogs.forEach(blog => { %>
-          <div class="col-md-4 mb-4">
-            <div class="card" style="width: 18rem;">
-              <img src="<%= blog.coverImageURL || 'https://via.placeholder.com/286x180' %>" class="card-img-top" alt="Blog Image">
+          <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="card blog-card shadow-sm">
+              <img 
+                src="<%= blog.coverImageURL || 'https://via.placeholder.com/286x220' %>" 
+                class="card-img-top" 
+                alt="Blog Image"
+              >
               <div class="card-body">
                 <h5 class="card-title"><%= blog.title %></h5>
-                <a href="/blog/<%= blog._id %>" class="btn btn-primary">Read More</a>
+                <a href="/blog/<%= blog._id %>" class="btn btn-primary mt-3">Read More</a>
               </div>
             </div>
           </div>
